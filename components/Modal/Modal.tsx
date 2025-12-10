@@ -1,56 +1,63 @@
-import React, { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+"use client";
+
+import React, { useEffect, useRef, useCallback } from "react";
+import { useRouter } from 'next/navigation'; 
 import css from "./Modal.module.css";
 
 interface ModalProps {
-  onClose: () => void;
-  children: React.ReactNode;
+children: React.ReactNode;
 }
 
-const Modal: React.FC<ModalProps> = ({ onClose, children }) => {
-  const [modalRoot, setModalRoot] = useState<HTMLElement | null>(null);
+const Modal: React.FC<ModalProps> = ({ children }) => {
+const router = useRouter();
+const modalRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setModalRoot(document.getElementById("modal-root") as HTMLElement);
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Escape") {
-        onClose();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onClose]);
-
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      onClose();
+const close = useCallback(() => {
+    
+    if (window.history.length > 1) {
+   router.back(); 
+    } else {
+        router.push('/notes/filter/all'); 
     }
-  };
+ }, [router]); 
+ 
+ useEffect(() => {
+ const handleKeyDown = (e: KeyboardEvent) => {
+ if (e.key === "Escape") {
+ close();
+ }
+ };
 
-  if (!modalRoot) {
-    return null;
-  }
+ window.addEventListener("keydown", handleKeyDown);
+ return () => {
+ window.removeEventListener("keydown", handleKeyDown);
+ };
+ }, [close]); 
 
-  return createPortal(
-    <div className={css.overlay} onClick={handleBackdropClick}>
-      <div className={css.modal}>{children}</div>
-    </div>,
-    modalRoot
-  );
+
+ useEffect(() => {
+ document.body.style.overflow = "hidden";
+ return () => {
+ document.body.style.overflow = "unset";
+ };
+ }, []);
+
+ const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+ if (e.target === e.currentTarget) {
+ close();
+ }
+ };
+
+ return (
+ <div className={css.overlay} onClick={handleBackdropClick}>
+ <div className={css.modal} ref={modalRef}>
+ <button className={css.closeButton} onClick={close}>
+ &times;
+ </button>
+ {children}
+ </div>
+ </div>
+ );
 };
 
 export default Modal;

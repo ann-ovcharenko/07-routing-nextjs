@@ -1,28 +1,30 @@
 import "./globals.css";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
-import TanStackProvider from "../components/TanStackProvider/TanStackProvider";
+import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
+import Header from "@/components/Header/Header";
+import Footer from "@/components/Footer/Footer";
 
-export const metadata = {
-  title: "NoteHub NextJS App",
-  description: "A notes application refactored to Next.js App Router.",
-};
-
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+  modal: React.ReactNode;
+}
+
+export default function RootLayout({ children, modal }: RootLayoutProps) {
   return (
     <html lang="uk">
       <body>
         <TanStackProvider>
           <Header />
-          <main style={{ minHeight: '80vh' }}>{children}</main> 
+          <main>{children}</main>
           <Footer />
+          {modal}
         </TanStackProvider>
-        <div id="modal-root" /> 
       </body>
     </html>
   );
 }
+
+export const metadata = {
+  title: "NoteHub",
+  description:
+    "A simple note-taking application built with Next.js and TanStack Query.",
+};
