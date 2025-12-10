@@ -2,13 +2,13 @@ import "./globals.css";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import React from "react";
 
-export default function RootLayout(props: {
-  children: React.ReactNode;
+interface LayoutProps extends React.PropsWithChildren {
   modal: React.ReactNode;
-}) {
-  const { children, modal } = props;
+}
 
+export default function RootLayout({ children, modal }: LayoutProps) {
   return (
     <html lang="uk">
       <body>
