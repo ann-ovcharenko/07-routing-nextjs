@@ -1,10 +1,19 @@
 /* @ts-nocheck */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types, @typescript-eslint/no-explicit-any
 import "./globals.css";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import { type ReactNode } from "react";
 
-export default function RootLayout({ children, modal }) {
+// Використовуємо inline анотацію типу в сигнатурі функції
+export default function RootLayout({
+  children,
+  modal,
+}: {
+  children: ReactNode;
+  modal: ReactNode;
+}) {
   return (
     <html lang="uk">
       <body>
