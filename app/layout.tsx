@@ -2,8 +2,19 @@ import "./globals.css";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
+import { type ReactNode } from "react";
 
-export default function RootLayout({ children, modal }) {
+type LayoutProps =
+  | {
+      children: ReactNode;
+      modal: ReactNode;
+    }
+  | {
+      children: ReactNode;
+      modal: ReactNode;
+    };
+
+export default function RootLayout({ children, modal }: LayoutProps) {
   return (
     <html lang="uk">
       <body>
