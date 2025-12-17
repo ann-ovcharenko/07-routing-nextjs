@@ -2,31 +2,38 @@
 
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchNotes, type FetchNotesParams } from "@/lib/api"; 
-import NoteList from "@/components/NoteList/NoteList"; 
-import SearchBox from "@/components/SearchBox/SearchBox"; 
-import Pagination from "@/components/Pagination/Pagination"; 
-import StatusError from "@/components/StatusError/StatusError"; 
-import StatusLoader from "@/components/StatusLoader/StatusLoader"; 
+import { fetchNotes, type FetchNotesParams } from "@/lib/api";
+import { Note } from "@/types/note";
+import NoteList from "@/components/NoteList/NoteList";
+import SearchBox from "@/components/SearchBox/SearchBox";
+import Pagination from "@/components/Pagination/Pagination";
+import StatusError from "@/components/StatusError/StatusError";
+import StatusLoader from "@/components/StatusLoader/StatusLoader";
 import css from "./FilteredNotesClient.module.css";
 
 interface FilteredNotesClientProps {
-  initialParams: FetchNotesParams & { tag?: string };
+  initialParams: FetchNotesParams & {
+    tag?: string;
+    data: {
+      notes: Note[];
+      totalPages: number;
+    };
+  };
 }
 
-const SEARCH_DEBOUNCE_DELAY = 300; 
+const SEARCH_DEBOUNCE_DELAY = 300;
 
-export default function FilteredNotesClient({ initialParams }: FilteredNotesClientProps) {
-  
-  const [params, setParams] = useState(initialParams); 
-  const [searchTerm, setSearchTerm] = useState(initialParams.search); 
-  
+export default function FilteredNotesClient({
+  initialParams,
+}: FilteredNotesClientProps) {
+  const [params, setParams] = useState(initialParams);
+  const [searchTerm, setSearchTerm] = useState(initialParams.search);
+
   useEffect(() => {
-  
     const delayDebounceFn = setTimeout(() => {
       setParams((prev) => ({
         ...prev,
-        page: 1, 
+        page: 1,
         search: searchTerm,
       }));
     }, SEARCH_DEBOUNCE_DELAY);
@@ -35,25 +42,29 @@ export default function FilteredNotesClient({ initialParams }: FilteredNotesClie
   }, [searchTerm]);
 
   const getTagForApi = (tag: string | undefined): string | undefined => {
-    return tag && tag !== 'all' ? tag : undefined;
+    return tag && tag !== "all" ? tag : undefined;
   };
-  
+
   const currentApiParams: FetchNotesParams = {
     page: params.page,
     perPage: params.perPage,
     search: params.search,
-    tag: getTagForApi(params.tag), 
+    tag: getTagForApi(params.tag),
   };
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["notes", currentApiParams],
     queryFn: () => fetchNotes(currentApiParams),
-    initialData: () => { 
-        return initialParams.page === currentApiParams.page && initialParams.search === currentApiParams.search 
-            ? initialParams.data 
-            : undefined;
+    initialData: () => {
+      const isSamePage = initialParams.page === currentApiParams.page;
+      const isSameSearch = initialParams.search === currentApiParams.search;
+      const isSameTag = initialParams.tag === currentApiParams.tag;
+
+      return isSamePage && isSameSearch && isSameTag
+        ? initialParams.data
+        : undefined;
     },
-    staleTime: 5000, 
+    staleTime: 5000,
   });
 
   const handlePageChange = (newPage: number) => {
@@ -84,13 +95,13 @@ export default function FilteredNotesClient({ initialParams }: FilteredNotesClie
   return (
     <div className={css.container}>
       <header className={css.header}>
-        <h1>Notes filtered by: {params.tag || 'All'}</h1>
+        <h1>Notes filtered by: {params.tag || "All"}</h1>
       </header>
 
       <div className={css.searchWrapper}>
-        <SearchBox 
-          searchTerm={searchTerm} 
-          onSearchChange={setSearchTerm} 
+        <SearchBox
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
           isSearching={isPending}
         />
       </div>
@@ -98,9 +109,13 @@ export default function FilteredNotesClient({ initialParams }: FilteredNotesClie
       <div className={css.contentWrapper}>
         <div className={css.notesList}>
           {notes.length === 0 && params.search ? (
-            <p>Нотаток за запитом "{params.search}" не знайдено.</p>
+            <p className={css.emptyMessage}>
+              Нотаток за запитом &quot;{params.search}&quot; не знайдено.
+            </p>
           ) : notes.length === 0 ? (
-            <p>Нотаток у цій категорії поки немає.</p>
+            <p className={css.emptyMessage}>
+              Нотаток у цій категорії поки немає.
+            </p>
           ) : (
             <NoteList notes={notes} />
           )}

@@ -1,8 +1,14 @@
+"use client";
+
 import React from "react";
 import css from "./StatusLoader.module.css";
 
-const StatusLoader: React.FC = () => {
-  return <div className={css.loader}>Завантаження нотаток...</div>;
+interface StatusLoaderProps {
+  message: string;
+}
+
+const StatusLoader: React.FC<StatusLoaderProps> = ({ message }) => {
+  return <div className={css.loader}>{message}</div>;
 };
 
 export default StatusLoader;
