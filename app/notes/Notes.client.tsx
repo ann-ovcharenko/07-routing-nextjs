@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react"; 
-import { useQuery } from "@tanstack/react-query"; 
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { fetchNotes, type FetchNotesParams } from "../../lib/api";
 import NoteList from "../../components/NoteList/NoteList";
 import NoteForm from "../../components/NoteForm/NoteForm";
@@ -12,32 +12,30 @@ import StatusError from "../../components/StatusError/StatusError";
 import StatusLoader from "../../components/StatusLoader/StatusLoader";
 import css from "./Notes.module.css";
 
-
 export default function NotesClient() {
-    
-  const [searchTerm, setSearchTerm] = useState(""); 
-    
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [params, setParams] = useState<FetchNotesParams>({
     page: 1,
     perPage: 10,
-    search: "", 
+    search: "",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const delayDebounceFn = setTimeout(() => {
-      setParams((prev) => ({ 
-        ...prev, 
-        search: searchTerm, 
-        page: 1 
+      setParams((prev) => ({
+        ...prev,
+        search: searchTerm,
+        page: 1,
       }));
     }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [searchTerm]); 
+  }, [searchTerm]);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, isFetching } = useQuery({
     queryKey: ["notes", params],
     queryFn: () => fetchNotes(params),
     placeholderData: (previousData) => previousData,
@@ -61,7 +59,11 @@ export default function NotesClient() {
     <div className={css.container}>
       <h1 className={css.pageTitle}>Your Notes</h1>
       <div className={css.controls}>
-        <SearchBox searchTerm={searchTerm} setSearchTerm={handleSearch} /> 
+        <SearchBox
+          searchTerm={searchTerm}
+          onSearchChange={handleSearch}
+          isSearching={isFetching}
+        />
         <button
           className={css.createButton}
           onClick={() => setIsModalOpen(true)}
@@ -70,7 +72,9 @@ export default function NotesClient() {
         </button>
       </div>
 
-      {isDataLoading && <StatusLoader />}
+      {isDataLoading && (
+        <StatusLoader message="Завантаження ваших нотаток..." />
+      )}
 
       {!isDataLoading && data && data.notes.length > 0 && (
         <>
@@ -86,6 +90,7 @@ export default function NotesClient() {
       {!isDataLoading && data && data.notes.length === 0 && (
         <p className={css.noResults}>No notes found matching your criteria.</p>
       )}
+
       {isModalOpen && (
         <Modal onClose={() => setIsModalOpen(false)}>
           <NoteForm onClose={() => setIsModalOpen(false)} />
