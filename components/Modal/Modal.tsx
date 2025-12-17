@@ -1,24 +1,29 @@
 "use client";
 
 import React, { useEffect, useRef, useCallback } from "react";
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from "next/navigation";
 import css from "./Modal.module.css";
 
 interface ModalProps {
   children: React.ReactNode;
+  onClose?: () => void;
 }
 
-const Modal: React.FC<ModalProps> = ({ children }) => {
+const Modal: React.FC<ModalProps> = ({ children, onClose }) => {
   const router = useRouter();
   const modalRef = useRef<HTMLDivElement>(null);
 
   const close = useCallback(() => {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back(); 
+    if (onClose) {
+      onClose();
     } else {
-      router.push('/notes/filter/all'); 
+      if (typeof window !== "undefined" && window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/notes/filter/all");
+      }
     }
-  }, [router]); 
+  }, [router, onClose]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -27,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({ children }) => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [close]); 
+  }, [close]);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -43,9 +48,9 @@ const Modal: React.FC<ModalProps> = ({ children }) => {
   return (
     <div className={css.overlay} onClick={handleBackdropClick}>
       <div className={css.modal} ref={modalRef} role="dialog" aria-modal="true">
-        <button 
-          type="button" 
-          className={css.closeButton} 
+        <button
+          type="button"
+          className={css.closeButton}
           onClick={close}
           aria-label="Close modal"
         >

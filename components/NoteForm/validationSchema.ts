@@ -17,6 +17,7 @@ export const NoteSchema = Yup.object().shape({
 
   content: Yup.string()
     .max(500, "Контент має бути не більше 500 символів")
+    .trim()
     .optional(),
 
   tag: Yup.string()
