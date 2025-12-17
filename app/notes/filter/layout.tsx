@@ -1,18 +1,16 @@
-import React from "react";
-import css from './FilterLayout.module.css'; 
+import { ReactNode } from "react";
 
-interface FilterLayoutProps {
-  children: React.ReactNode;
-  sidebar: React.ReactNode;
-}
-
-export default function FilterLayout({ children, sidebar }: FilterLayoutProps) {
+export default function FilterLayout({
+  children,
+  sidebar, 
+}: {
+  children: ReactNode;
+  sidebar: ReactNode;
+}) {
   return (
-    <div className={css.layoutContainer}>
-      <div className={css.mainLayout}>
-        <aside>{sidebar}</aside>
-        <main>{children}</main>
-      </div>
+    <div style={{ display: "flex" }}>
+      <aside>{sidebar}</aside>
+      <section>{children}</section>
     </div>
   );
 }
