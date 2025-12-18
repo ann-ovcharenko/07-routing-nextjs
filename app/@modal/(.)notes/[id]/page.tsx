@@ -1,13 +1,11 @@
-import NotePreview from '@/components/NotePreview/NotePreview';
+import NotePreviewClient from "./NotePreview.client";
 
 interface ModalPageProps {
   params: {
-    id: string; 
+    id: string;
   };
 }
 
 export default function NoteModalPage({ params }: ModalPageProps) {
-  const { id } = params;
-
-  return <NotePreview noteId={id} />;
+  return <NotePreviewClient id={params.id} />;
 }

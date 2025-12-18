@@ -1,34 +1,23 @@
-import React from 'react';
-import { fetchNoteById } from '@/lib/api'; 
-import Modal from '@/components/Modal/Modal'; 
-import css from './NotePreview.module.css'; 
+"use client";
+
+import React from "react";
+import { Note } from "@/types/note";
+import css from "./NotePreview.module.css";
 
 interface NotePreviewProps {
-  noteId: string;
+  note: Note;
 }
 
-export default async function NotePreview({ noteId }: NotePreviewProps) {
-  
-  const note = await fetchNoteById(noteId);
-
-  if (!note) {
-    return (
-      <Modal>
-        <div className={css.errorContainer}>
-          <h2 className={css.errorTitle}>Error 404</h2>
-          <p>Note with ID: {noteId} not found.</p>
-        </div>
-      </Modal>
-    );
-  }
-
+const NotePreview: React.FC<NotePreviewProps> = ({ note }) => {
   return (
-    <Modal>
-      <div className={css.previewContainer}>
-        <h2 className={css.title}>{note.title}</h2>
-        <p className={css.content}>{note.content}</p>
-        <p className={css.date}>Created: {note.createdAt}</p>
-      </div>
-    </Modal>
+    <div className={css.previewContainer}>
+      <h2 className={css.title}>{note.title}</h2>
+      <p className={css.content}>{note.content}</p>
+      <p className={css.date}>
+        Created: {new Date(note.createdAt).toLocaleDateString()}
+      </p>
+    </div>
   );
-}
+};
+
+export default NotePreview;
