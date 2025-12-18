@@ -11,6 +11,8 @@ import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
   onClose?: () => void;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 const initialValues: NoteCreationData = {
@@ -21,12 +23,14 @@ const initialValues: NoteCreationData = {
 
 const tags: NoteTag[] = ["Todo", "Work", "Personal", "Meeting", "Shopping"];
 
-const NoteForm: React.FC<NoteFormProps> = ({ onClose }) => {
+const NoteForm: React.FC<NoteFormProps> = ({ onClose, onSuccess, onCancel }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
 
   const handleClose = () => {
-    if (onClose) {
+    if (onCancel) {
+      onCancel();
+    } else if (onClose) {
       onClose();
     } else {
       router.back();
@@ -37,7 +41,11 @@ const NoteForm: React.FC<NoteFormProps> = ({ onClose }) => {
     mutationFn: createNote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
-      handleClose();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        handleClose();
+      }
     },
     onError: (error) => {
       console.error("Помилка при створенні нотатки:", error);
@@ -92,7 +100,7 @@ const NoteForm: React.FC<NoteFormProps> = ({ onClose }) => {
           <button
             type="button"
             className={css.cancelButton}
-            onClick={handleClose}
+            onClick={onCancel || handleClose} 
           >
             Cancel
           </button>
