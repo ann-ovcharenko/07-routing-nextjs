@@ -14,7 +14,7 @@ export const Header: FC = () => {
             <Link href="/">Home</Link>
           </li>
           <li>
-            <Link href="/notes">Notes</Link>
+            <Link href="/notes/filter/all">Notes</Link>
           </li>
         </ul>
       </nav>

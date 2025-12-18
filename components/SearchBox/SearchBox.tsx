@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import css from "./SearchBox.module.css";
 
 interface SearchBoxProps {
@@ -14,6 +14,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   onSearchChange,
   isSearching,
 }) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onSearchChange(event.target.value);
   };
@@ -27,7 +33,10 @@ const SearchBox: React.FC<SearchBoxProps> = ({
         value={searchTerm}
         onChange={handleChange}
       />
-      {isSearching && <span className={css.loader}>Searching...</span>}
+      
+      {isMounted && isSearching && (
+        <span className={css.loader}>Searching...</span>
+      )}
     </div>
   );
 };

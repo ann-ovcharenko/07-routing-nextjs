@@ -4,11 +4,11 @@ import {
   HydrationBoundary,
 } from "@tanstack/react-query";
 import { fetchNotes, FetchNotesParams } from "@/lib/api";
-import FilteredNotesClient from "./Notes.client";
+import NotesClient from "./Notes.client"; 
 
 interface NoteFilterPageProps {
   params: {
-    tag: string[];
+    slug: string[]; 
   };
 }
 
@@ -19,18 +19,17 @@ const defaultParams: Omit<FetchNotesParams, "tag"> = {
 };
 
 export default async function NoteFilterPage({ params }: NoteFilterPageProps) {
-  const filterTag = params.tag?.[0] || "all";
-  const tagToFetch = filterTag !== "all" ? filterTag : undefined;
+  const filterSlug = params.slug?.[0] || "all";
+  const tagToFetch = filterSlug !== "all" ? filterSlug : undefined;
 
   const apiParams: FetchNotesParams = {
     ...defaultParams,
-    page: 1,
     tag: tagToFetch,
   };
 
   const queryClient = new QueryClient();
 
-  const notesData = await queryClient.fetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: ["notes", apiParams],
     queryFn: () => fetchNotes(apiParams),
   });
@@ -39,13 +38,7 @@ export default async function NoteFilterPage({ params }: NoteFilterPageProps) {
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <FilteredNotesClient
-        initialParams={{
-          ...apiParams,
-          tag: filterTag,
-          data: notesData,
-        }}
-      />
+      <NotesClient slug={filterSlug} />
     </HydrationBoundary>
   );
 }
