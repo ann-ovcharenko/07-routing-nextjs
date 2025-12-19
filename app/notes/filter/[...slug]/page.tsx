@@ -4,12 +4,12 @@ import {
   HydrationBoundary,
 } from "@tanstack/react-query";
 import { fetchNotes, FetchNotesParams } from "@/lib/api";
-import NotesClient from "./Notes.client"; 
+import NotesClient from "./Notes.client";
 
 interface NoteFilterPageProps {
-  params: {
-    slug: string[]; 
-  };
+  params: Promise<{
+    slug: string[];
+  }>;
 }
 
 const defaultParams: Omit<FetchNotesParams, "tag"> = {
@@ -19,11 +19,14 @@ const defaultParams: Omit<FetchNotesParams, "tag"> = {
 };
 
 export default async function NoteFilterPage({ params }: NoteFilterPageProps) {
-  const filterSlug = params.slug?.[0] || "all";
+  const { slug } = await params;
+
+  const filterSlug = slug?.[0] || "all";
   const tagToFetch = filterSlug !== "all" ? filterSlug : undefined;
 
   const apiParams: FetchNotesParams = {
     ...defaultParams,
+    page: 1,
     tag: tagToFetch,
   };
 

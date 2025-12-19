@@ -3,13 +3,13 @@ import Modal from '@/components/Modal/Modal';
 import NoteEditForm from '@/components/NoteEditForm/NoteEditForm'; 
 
 interface EditNoteModalPageProps {
-  params: {
+  params: Promise<{
     id: string; 
-  };
+  }>;
 }
 
-export default function EditNoteModalPage({ params }: EditNoteModalPageProps) {
-    const { id: noteId } = params;
+export default async function EditNoteModalPage({ params }: EditNoteModalPageProps) {
+    const { id: noteId } = await params;
 
     if (!noteId) {
         return (
